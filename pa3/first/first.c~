@@ -1,0 +1,70 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
+
+int* assignzero(int*,int);
+int* int2unsign(int*,int,int);
+void print(int*,int);
+
+int* assignzero(int* bin,int end){
+  for(int i=0;i<end;i++){
+    bin[i]=0;
+  }
+  return bin;
+}
+
+void print(int* bin,int size){
+  for(int i=size-1;i>=0;i--){
+    printf("%d",bin[i]);
+  }
+  printf("\n");
+}
+
+int* int2unsign(int* bin, int num, int size){
+  if(size<=0){
+    printf("Error, size <= 0\n");
+    return bin;
+  }
+  if(num==0){
+    print(bin,size);
+    return bin;
+  }
+  int significant=0;
+  int sigval=1;
+  while(sigval <= num){
+    //printf("%d %d\n",sigval,significant);
+    significant++;
+    sigval= sigval<<1;
+  }
+  significant--;
+  sigval=sigval-sigval/2;
+  int counter=significant;
+  for(;counter>=0;counter--){
+    if(num==0){
+      break;
+    }
+    if(sigval<=num){
+      num=num-sigval;
+      bin[counter]=1;
+    }
+    sigval=sigval>>1;
+  }
+  print(bin,size);
+  bin=assignzero(bin,size);
+  return bin;
+}
+int main(int argc, char * argv[argc+1]){
+  int num=0, size=0;
+  FILE* fp=fopen(argv[1],"r");
+  if(fp==0){
+    printf("Cannot open file\n");
+    return EXIT_SUCCESS;
+  }
+  int* bin=malloc(64*sizeof(int));
+  bin=assignzero(bin,64);
+  while(fscanf(fp,"%d %d",&num,&size)!=EOF){
+    bin=int2unsign(bin,num,size);
+    //printf("%d %d",num,size);
+  }
+  free(bin);
+}
